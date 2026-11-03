@@ -2,6 +2,11 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<link rel="apple-touch-icon" href="app-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kursplanung">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#17248e">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kursplanung Schwimmkurse</title>
@@ -672,6 +677,73 @@
 
   .hidden { display: none !important; }
 
+
+  /* Einblender: Zum Home-Bildschirm hinzufügen */
+  .install-hint {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 14px 14px 14px 16px;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: var(--text-dark);
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-edge);
+    box-shadow: var(--rim), 0 12px 32px rgba(23, 36, 142, 0.22);
+    opacity: 0;
+    transform: translateY(24px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .install-hint.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .install-hint img {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(23, 36, 142, 0.25);
+  }
+
+  .install-hint-text { flex: 1; min-width: 0; }
+  .install-hint-text strong { display: block; font-size: 0.95rem; margin-bottom: 2px; }
+
+  .install-hint .share-icon {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    vertical-align: -0.2em;
+    color: #0a7aff;
+  }
+
+  .install-hint-close {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    color: var(--text-medium);
+    background: rgba(23, 36, 142, 0.08);
+  }
+
+  body.has-install-hint { padding-bottom: 120px; }
+
   /* Fallback ohne backdrop-filter */
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .card { background: rgba(255, 255, 255, 0.88); }
@@ -825,6 +897,15 @@
 
     </div>
   </div>
+</div>
+
+<div class="install-hint" id="installHint" role="dialog" aria-label="Zum Home-Bildschirm hinzufügen">
+  <img src="app-icon.png" alt="">
+  <div class="install-hint-text">
+    <strong>Als App speichern</strong>
+    <span id="installHintText"></span>
+  </div>
+  <button type="button" class="install-hint-close" id="installHintClose" aria-label="Schließen">✕</button>
 </div>
 
 <script>
@@ -1211,6 +1292,36 @@
   // ==== INIT ====
   renderCourses();
   renderDays();
+  // ==== EINBLENDER: ZUM HOME-BILDSCHIRM ====
+  (function setupInstallHint() {
+    const KEY = 'kursplanung_install_hint_closed';
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/.test(ua);
+    const isStandalone = window.navigator.standalone === true ||
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    if ((!isIOS && !isAndroid) || isStandalone) return;
+
+    try { if (localStorage.getItem(KEY)) return; } catch (e) { /* ignorieren */ }
+
+    const shareIcon = '<svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+    const hint = document.getElementById('installHint');
+    document.getElementById('installHintText').innerHTML = isIOS
+      ? 'Tippe auf das Teilen-Symbol ' + shareIcon + ' und wähle „Zum Home-Bildschirm“.'
+      : 'Tippe oben rechts auf das Menü (⋮) und wähle „Zum Startbildschirm hinzufügen“.';
+
+    function close() {
+      hint.classList.remove('show');
+      document.body.classList.remove('has-install-hint');
+      try { localStorage.setItem(KEY, '1'); } catch (e) { /* ignorieren */ }
+    }
+    document.getElementById('installHintClose').addEventListener('click', close);
+
+    setTimeout(() => {
+      hint.classList.add('show');
+      document.body.classList.add('has-install-hint');
+    }, 1500);
+  })();
 </script>
 
 </body>
