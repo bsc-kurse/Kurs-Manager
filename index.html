@@ -1353,6 +1353,170 @@
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
   }
+
+  /* ===== v5: ruhiger, flacher, weniger "Glas" ===== */
+  :root {
+    --line: #d5dae6;
+    --paper: #ffffff;
+    --r: 10px;
+  }
+  body { background: #f3f4f7; }
+
+  header {
+    text-align: left;
+    padding: 22px 28px;
+    border-radius: var(--r);
+    background: var(--primary);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    border: 0;
+    border-bottom: 4px solid var(--accent);
+    box-shadow: none;
+  }
+  header h1 { font-size: 1.6rem; letter-spacing: -0.01em; }
+  header p { opacity: 0.85; font-size: 0.95rem; font-weight: 400; }
+  .header-logo { box-shadow: none; }
+
+  .card {
+    border-radius: var(--r);
+    background: var(--paper);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    border: 1px solid var(--line);
+    box-shadow: none;
+  }
+
+  /* Schritte: nur Zahl + Beschriftung, keine Farbverläufe */
+  .step-circle { box-shadow: none; background: #e6e9f1; border: 1px solid var(--line); }
+  .step.active .step-circle { background: var(--primary); border-color: var(--primary); box-shadow: none; }
+  .step.done .step-circle { background: var(--success); border-color: var(--success); box-shadow: none; }
+  .progress-bar-track { border-radius: 2px; background: #e6e9f1; box-shadow: none; }
+  .progress-bar-fill { border-radius: 2px; background: var(--primary); box-shadow: none; }
+
+  .info-box, .banner, .summary-box, .pk-wishes, .pk-taken, .slot-panel, .receipt-preview,
+  .day-card, .install-hint {
+    border-radius: var(--r);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    box-shadow: none;
+  }
+  .info-box { background: #f3f5fb; border: 1px solid var(--line); border-left: 4px solid var(--primary); }
+  .summary-box { background: #f7f8fb; border: 1px solid var(--line); }
+  .day-card { background: #f7f8fb; border: 1px solid var(--line); }
+  .install-hint { background: var(--paper); border: 1px solid var(--line); box-shadow: 0 -2px 12px rgba(0,0,0,.08); }
+
+  /* Kurs- und Auswahlkarten */
+  .course-card, .radio-option, .pk-card, .home-tile, .menu-pop {
+    border-radius: var(--r);
+    background: var(--paper);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    border: 1px solid var(--line);
+    box-shadow: none;
+  }
+  .course-card:hover, .home-tile:hover, .radio-option:hover { background: #f6f7fb; box-shadow: none; transform: none; }
+  .course-card.selected, .radio-option.selected {
+    background: #f1f3fb;
+    border-color: var(--primary);
+    box-shadow: inset 0 0 0 1px var(--primary);
+  }
+  .checkbox-box { border-radius: 5px; background: var(--paper); box-shadow: none; }
+  .course-card.selected .checkbox-box { background: var(--primary); box-shadow: none; }
+  .pk-card.taken { background: #f3f4f7; }
+
+  /* Startseite: Kacheln mit Akzentstreifen statt Glas-Icons */
+  .home-tile { border-top: 4px solid var(--primary); }
+  #homeTiles .home-tile, #chooseTiles .home-tile { border-radius: var(--r); }
+  .tile-icon, #homeTiles .tile-icon, .empty-icon {
+    border-radius: 8px;
+    background: var(--primary);
+    box-shadow: none;
+  }
+  .tile-title { letter-spacing: 0; }
+
+  /* Eingabefelder */
+  input[type="text"], input[type="time"], textarea, select {
+    border-radius: 8px;
+    background: var(--paper);
+    border: 1px solid #b9c0d2;
+    box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  input[type="text"]:focus, input[type="time"]:focus, textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(23, 36, 142, 0.15);
+  }
+
+  /* Buttons */
+  button { border-radius: 8px; }
+  .btn-primary {
+    background: var(--accent);
+    color: #1d1d1f;
+    box-shadow: none;
+    border: 1px solid var(--accent-dark);
+  }
+  .btn-primary:hover { background: #ffd04d; box-shadow: none; }
+  .btn-secondary {
+    background: var(--paper);
+    border: 1px solid #b9c0d2;
+    box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  .btn-secondary:hover { background: #f3f4f7; }
+
+  /* Menü */
+  .menu-btn {
+    border-radius: 8px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.35);
+    box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  .menu-pop { box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+  .menu-item { border-radius: 6px; }
+
+  /* Zeit-Chips und Verfügbarkeit */
+  .slot-panel { background: #f7f8fb; border: 1px solid var(--line); animation: none; }
+  .slot-chip {
+    border-radius: 8px;
+    background: var(--paper);
+    border: 1px solid #b9c0d2;
+    box-shadow: none;
+  }
+  .slot-chip[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); box-shadow: none; }
+
+  .avail { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .avail-row { margin-top: 12px; }
+  .avail-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .avail-head strong { font-size: 0.95rem; }
+  .avail-head span { font-size: 0.8rem; color: var(--text-light); }
+  .avail-times { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .avail-times label { display: block; font-size: 0.78rem; font-weight: 500; color: var(--text-medium); }
+  .avail-times input { margin-top: 3px; }
+
+  /* Wunschtag-Auswahl bei Privatkursen */
+  .pk-days { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .pk-day {
+    min-width: 42px;
+    padding: 8px 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-medium);
+    background: var(--paper);
+    border: 1px solid #b9c0d2;
+    box-shadow: none;
+  }
+  .pk-day[aria-pressed="true"] { color: #fff; background: var(--primary); border-color: var(--primary); }
+
+  @media (max-width: 640px) {
+    header { padding: 18px 16px; border-radius: var(--r); }
+    .card { border-radius: var(--r); }
+  }
+  @media (max-width: 400px) {
+    .course-card { border-radius: var(--r); }
+  }
+
+  /* v5 Korrekturen */
+  header:has(#menuBtn:not(.hidden)) h1 { padding-left: 54px; }
+  header:has(#menuBtn:not(.hidden)) p { padding-left: 54px; }
+  .home-tile { border-top: 1px solid var(--line); box-shadow: inset 0 4px 0 var(--primary); }
+  .info-box { border-radius: 6px; }
 </style>
 </head>
 <body>
@@ -1653,12 +1817,12 @@
 
   // Mögliche Zeiten pro Kurs
   const SLOTS_FIXED = [
-    { day: 'Montag', time: '17:00–18:00' },
-    { day: 'Donnerstag', time: '17:00–17:45' },
-    { day: 'Freitag', time: '17:30–18:15' },
-    { day: 'Samstag', time: '11:15–16:30' }
+    { day: 'Montag', time: '17:00–18:00', from: '17:00', to: '18:00' },
+    { day: 'Donnerstag', time: '17:00–17:45', from: '17:00', to: '17:45' },
+    { day: 'Freitag', time: '17:30–18:15', from: '17:30', to: '18:15' },
+    { day: 'Samstag', time: '11:15–16:30', from: '11:15', to: '16:30' }
   ];
-  const SLOTS_OPEN = DAYS.map(d => ({ day: d, time: 'ab 17:00' }));
+  const SLOTS_OPEN = DAYS.map(d => ({ day: d, time: 'ab 17:00', from: '17:00', to: '' }));
   const COURSE_SLOTS = {
     'Krebs': SLOTS_OPEN,
     'Seepferd': SLOTS_OPEN,
@@ -1669,6 +1833,7 @@
   let state = {
     selectedCourses: [],
     slots: {},          // { Krebs: ['Montag', 'Dienstag'], ... }
+    avail: {},          // { 'Krebs|Montag': { from: '17:30', to: '19:00' } }
     name: '',
     role: 'Hauptleitung',
     remarks: ''
@@ -1766,11 +1931,55 @@
           <p class="slot-title">${open
             ? 'An allen Tagen ab 17:00 möglich. Tippe die Tage an, an denen du kannst:'
             : 'Tippe die Zeiten an, an denen du kannst:'}</p>
-          <div class="slot-grid">${chips}</div>`;
+          <div class="slot-grid">${chips}</div>${availHtml(course)}`;
         block.appendChild(panel);
       }
       grid.appendChild(block);
     });
+  }
+
+  // Pro gewählte Zeit: von wann bis wann die Person wirklich kann
+  function availKey(course, day) { return course + '|' + day; }
+
+  function availHtml(course) {
+    const chosen = COURSE_SLOTS[course].filter(sl => (state.slots[course] || []).includes(sl.day));
+    if (!chosen.length) return '';
+    const rows = chosen.map(sl => {
+      const a = state.avail[availKey(course, sl.day)] || { from: '', to: '' };
+      const key = availKey(course, sl.day);
+      const lo = sl.from ? ` min="${sl.from}"` : '';
+      const hi = sl.to ? ` max="${sl.to}"` : '';
+      return `
+        <div class="avail-row">
+          <div class="avail-head"><strong>${sl.day}</strong><span>Kurs ${sl.time}</span></div>
+          <div class="avail-times">
+            <label>Ich kann von<input type="time" class="avail-in" data-key="${key}" data-which="from" value="${a.from}"${lo}${hi}></label>
+            <label>bis<input type="time" class="avail-in" data-key="${key}" data-which="to" value="${a.to}"${lo}${hi}></label>
+          </div>
+        </div>`;
+    }).join('');
+    return `
+      <div class="avail">
+        <p class="slot-title">Der Kurs findet innerhalb dieser Zeit statt. Von wann bis wann kannst du?</p>
+        ${rows}
+      </div>`;
+  }
+
+  // Prüft die Zeitangaben; liefert eine Fehlermeldung oder ''
+  function availProblem() {
+    for (const course of state.selectedCourses) {
+      for (const sl of COURSE_SLOTS[course]) {
+        if (!(state.slots[course] || []).includes(sl.day)) continue;
+        const a = state.avail[availKey(course, sl.day)] || {};
+        const where = `${course}, ${sl.day}`;
+        if (!a.from || !a.to) return `⚠ Bitte gib bei ${where} an, von wann bis wann du kannst.`;
+        if (a.from >= a.to) return `⚠ Bei ${where} muss „bis" nach „von" liegen.`;
+        if ((sl.from && a.from < sl.from) || (sl.to && a.to > sl.to)) {
+          return `⚠ Bei ${where} muss deine Zeit innerhalb von ${sl.time} liegen.`;
+        }
+      }
+    }
+    return '';
   }
 
   function toggleCourse(course) {
@@ -1781,6 +1990,7 @@
     } else {
       state.selectedCourses.splice(idx, 1);
       delete state.slots[course];
+      Object.keys(state.avail).forEach(k => { if (k.startsWith(course + '|')) delete state.avail[k]; });
     }
     document.getElementById('step1Error').classList.remove('show');
     renderCourses();
@@ -1792,15 +2002,28 @@
     const course = chip.dataset.course;
     const list = state.slots[course] || (state.slots[course] = []);
     const i = list.indexOf(chip.dataset.day);
-    if (i === -1) list.push(chip.dataset.day); else list.splice(i, 1);
+    if (i === -1) list.push(chip.dataset.day);
+    else { list.splice(i, 1); delete state.avail[availKey(course, chip.dataset.day)]; }
     document.getElementById('step1Error').classList.remove('show');
     renderCourses();
+  });
+
+  document.getElementById('courseGrid').addEventListener('input', e => {
+    const inp = e.target.closest('.avail-in');
+    if (!inp) return;
+    const a = state.avail[inp.dataset.key] || (state.avail[inp.dataset.key] = { from: '', to: '' });
+    a[inp.dataset.which] = inp.value;
+    document.getElementById('step1Error').classList.remove('show');
   });
 
   // Gewählte Zeiten eines Kurses (in Wochen-Reihenfolge) als Text
   function chosenSlotTexts(course) {
     const chosen = state.slots[course] || [];
-    return COURSE_SLOTS[course].filter(sl => chosen.includes(sl.day)).map(slotLabel);
+    return COURSE_SLOTS[course].filter(sl => chosen.includes(sl.day)).map(sl => {
+      const a = state.avail[availKey(course, sl.day)];
+      const mine = a && a.from && a.to ? ` (ich kann ${a.from}–${a.to})` : '';
+      return slotLabel(sl) + mine;
+    });
   }
 
   // ==== TAGE & ZEITEN (wiederverwendbar) ====
@@ -1916,6 +2139,7 @@
       } else {
         const missing = state.selectedCourses.find(c => (state.slots[c] || []).length === 0);
         if (missing) msg = `⚠ Bitte wähle bei ${missing} mindestens eine Zeit aus.`;
+        else msg = availProblem();
       }
       if (msg) {
         box.textContent = msg;
@@ -2012,7 +2236,7 @@
 
     // z. B. "Krebs: Montag ab 17:00, Dienstag ab 17:00 | Pinguin: Montag 17:00-18:00"
     const slotsText = state.selectedCourses
-      .map(c => c + ': ' + chosenSlotTexts(c).join(', ').replace(/–/g, '-'))
+      .map(c => c + ': ' + chosenSlotTexts(c).join(', ').replace(/–/g, '-').replace(/\(ich kann /g, '(verfügbar '))
       .join(' | ');
 
     const payload = {
@@ -2065,6 +2289,7 @@
     state = {
       selectedCourses: [],
       slots: {},
+      avail: {},
       name: '',
       role: 'Hauptleitung',
       remarks: ''
@@ -2140,9 +2365,9 @@
       const cardTop = y;
       if (draw) {
         ctx.save();
-        ctx.shadowColor = 'rgba(23,36,142,0.16)';
-        ctx.shadowBlur = 40;
-        ctx.shadowOffsetY = 12;
+        ctx.shadowColor = 'rgba(0,0,0,0)';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
         ctx.fillStyle = '#ffffff';
         roundRect(ctx, CARD_X, cardTop, W - 2 * CARD_X, cardH, RADIUS);
         ctx.fill();
@@ -2190,7 +2415,7 @@
 
     const grad = ctx.createLinearGradient(0, 0, W, HEADER_H);
     grad.addColorStop(0, '#17248e');
-    grad.addColorStop(1, '#2e3ea8');
+    grad.addColorStop(1, '#17248e');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, HEADER_H);
 
@@ -2519,12 +2744,13 @@
       (pkIsWish(f) ? wishes : normal).push(f);
     });
     const taken = !!kurs.eingeschrieben;
-    // Steht im Sheet schon ein Wunschtag/eine Wunschzeit, wird nicht nochmals gefragt
-    const hasDayWish = kurs.felder.some(f => /wunsch/i.test(f.label) && /(tag|zeit)/i.test(f.label));
-    const wishField = hasDayWish ? '' : `
+    // Die Trainerin / der Trainer kann immer einen eigenen Wunschtag angeben
+    const PK_DAYS = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+    const wishField = `
           <div class="field">
-            <label>Wunschtage und Zeiten</label>
-            <input type="text" class="pk-wish" placeholder="z. B. Montag ab 16 Uhr, Mittwoch ganzer Tag">
+            <label>Mein Wunschtag</label>
+            <div class="pk-days">${PK_DAYS.map(d => `<button type="button" class="pk-day" data-day="${d}" aria-pressed="false">${d.slice(0, 2)}</button>`).join('')}</div>
+            <input type="text" class="pk-wish" placeholder="Uhrzeit, z. B. ab 16 Uhr" aria-label="Wunschzeit">
           </div>`;
     const enrollHtml = taken ? pkTakenHtml(kurs.eingeschrieben, false) : `
         <div class="pk-actions"><button type="button" class="btn-primary btn-sm pk-open">Einschreiben</button></div>
@@ -2573,7 +2799,11 @@
       name: name,
       kurs: pkTitle(kurs),
       zeile: kurs.id,
-      wunsch: card.querySelector('.pk-wish') ? card.querySelector('.pk-wish').value.trim() : '',
+      wunsch: (function () {
+        const days = Array.from(card.querySelectorAll('.pk-day[aria-pressed="true"]')).map(b => b.dataset.day).join(', ');
+        const time = card.querySelector('.pk-wish').value.trim();
+        return [days, time].filter(Boolean).join(' · ');
+      })(),
       remarks: card.querySelector('.pk-remarks').value.trim()
     };
     let result = null;
@@ -2605,6 +2835,11 @@
   document.getElementById('pkBody').addEventListener('click', e => {
     const card = e.target.closest('.pk-card');
     if (!card) return;
+    const dayBtn = e.target.closest('.pk-day');
+    if (dayBtn) {
+      dayBtn.setAttribute('aria-pressed', dayBtn.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      return;
+    }
     if (e.target.closest('.pk-open')) {
       card.querySelector('.pk-actions').classList.add('hidden');
       card.querySelector('.pk-enroll').classList.remove('hidden');
