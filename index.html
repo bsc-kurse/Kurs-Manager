@@ -1154,6 +1154,59 @@
     .course-count { font-size: 0.74rem; padding: 3px 8px; }
   }
 
+
+  /* ===== Datenschutz, Kontakt, Zugangscode ===== */
+  .summary-box + .banner { margin-top: 20px; margin-bottom: 0; }
+
+  .privacy-note {
+    margin-top: 18px;
+    font-size: 0.82rem;
+    color: var(--text-light);
+  }
+
+  .privacy-note a, .gate-contact a, .legal a, .app-footer a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .privacy-note a:hover, .gate-contact a:hover, .legal a:hover, .app-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .app-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 10px;
+    margin-top: 20px;
+    font-size: 0.82rem;
+    color: var(--text-medium);
+    text-align: center;
+  }
+
+  .gate-contact {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-medium);
+  }
+
+  .legal h3 {
+    margin: 22px 0 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .legal p, .legal li {
+    color: var(--text-medium);
+    font-size: 0.95rem;
+  }
+
+  .legal ul { padding-left: 20px; }
+  .legal li { margin-bottom: 6px; }
+
   /* Fallback ohne backdrop-filter */
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .card { background: rgba(255, 255, 255, 0.88); }
@@ -1307,6 +1360,8 @@
       <div id="step3" class="hidden">
         <h2 class="section-title">✓ Übersicht deiner Eintragung</h2>
         <div class="summary-box" id="summaryBox"></div>
+        <div class="banner error" id="submitError"></div>
+        <p class="privacy-note">Deine Angaben werden zur Kursplanung gespeichert. <a href="#datenschutz">Datenschutz</a></p>
         <div class="btn-row">
           <button class="btn-secondary" onclick="goToStep(2)">← Zurück</button>
           <button class="btn-primary" id="submitBtn" onclick="submitForm()">✓ Eintragung bestätigen</button>
@@ -1369,6 +1424,9 @@
             <textarea id="hlRemarks" placeholder="Weitere Informationen, Anforderungen oder Anmerkungen..."></textarea>
           </div>
 
+          <div class="banner error" id="hlSaveError"></div>
+          <p class="privacy-note">Deine Angaben werden zur Kursplanung gespeichert. <a href="#datenschutz">Datenschutz</a></p>
+
           <div class="btn-row">
             <button type="button" class="btn-primary" id="hlSubmit" onclick="submitHilfsleitung()">✓ Eintragung bestätigen</button>
           </div>
@@ -1403,6 +1461,72 @@
     </div>
   </section>
 
+
+  <!-- ZUGANGSCODE -->
+  <section id="view-gate" class="view hidden">
+    <div class="card">
+      <div class="content">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          </div>
+          <p class="empty-title">Zugangscode nötig</p>
+          <p class="empty-text">Bitte gib den Zugangscode ein, um die App zu nutzen.</p>
+        </div>
+        <div class="field pk-code">
+          <label for="gateInput">Zugangscode</label>
+          <input type="text" id="gateInput" autocomplete="off" autocapitalize="off" autocorrect="off">
+          <div class="error-msg" id="gateError"></div>
+        </div>
+        <div class="btn-row"><button type="button" class="btn-primary" id="gateBtn">Öffnen</button></div>
+        <p class="gate-contact">Du hast keinen Code? Melde dich bei <a class="js-contact"></a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATENSCHUTZ -->
+  <section id="view-datenschutz" class="view hidden">
+    <div class="card">
+      <div class="content legal">
+        <h2 class="section-title">Datenschutz</h2>
+
+        <h3>Wer ist verantwortlich?</h3>
+        <p>Der BSC. Bei Fragen zu den Kursen oder zu deinen Daten erreichst du uns unter <a class="js-contact"></a>.</p>
+
+        <h3>Welche Daten speichern wir?</h3>
+        <ul>
+          <li><strong>Kurseinteilung (Haupt- und Hilfsleitung):</strong> Name, gewählte Kurse bzw. Wunschkurs, Rolle, verfügbare Tage und Zeiten, Bemerkung und der Zeitpunkt deiner Eintragung.</li>
+          <li><strong>Privatkurse:</strong> Du siehst Anfragen mit Angaben wie Name, Alter, Schwimmerfahrung und Wünschen. Wenn du dich einschreibst, speichern wir deinen Namen und deine Bemerkung.</li>
+        </ul>
+
+        <h3>Wofür verwenden wir die Daten?</h3>
+        <p>Nur für die Planung und Einteilung der Kurse und für die Zuteilung der Privatkurse.</p>
+
+        <h3>Wo werden die Daten gespeichert?</h3>
+        <p>In einer Google Tabelle des BSC (Google Tabellen und Google Apps Script). Die App selbst wird über GitHub Pages bereitgestellt. Google und GitHub können Daten auf Servern ausserhalb der Schweiz verarbeiten.</p>
+
+        <h3>Zugangscode und Daten auf deinem Gerät</h3>
+        <p>Die App ist durch einen Zugangscode geschützt. Auf deinem Gerät merkt sie sich diesen Code und den zuletzt eingegebenen Namen, damit du ihn nicht erneut eintippen musst. Wir verwenden keine Tracking-Cookies und keine Analyse-Dienste.</p>
+
+        <h3>Wie lange speichern wir die Daten?</h3>
+        <p>Wir löschen die Daten nach Abschluss der jeweiligen Kursplanung.</p>
+
+        <h3>Deine Rechte</h3>
+        <p>Du kannst jederzeit Auskunft über deine Daten verlangen sowie deren Berichtigung oder Löschung. Schreibe uns dazu an <a class="js-contact"></a>.</p>
+
+        <div class="btn-row">
+          <button type="button" class="btn-secondary" onclick="location.hash='#start'">← Zur Startseite</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="app-footer">
+    <span>Kontakt: <a class="js-contact"></a></span>
+    <span aria-hidden="true">·</span>
+    <a href="#datenschutz">Datenschutz</a>
+  </footer>
+
 </div>
 
 <div class="install-hint" id="installHint" role="dialog" aria-label="Zum Home-Bildschirm hinzufügen">
@@ -1417,6 +1541,9 @@
 <script>
   // ==== KONFIGURATION ====
   const POWER_AUTOMATE_URL = 'https://script.google.com/macros/s/AKfycbxxfoZeILa9QTLfLnSDSDXYmlycDcXrU79RPeJPW_dOLtUzSgmWCn32AtSVr8rhibDs/exec';
+
+  const CONTACT_EMAIL = 'kurse@bsc.li';
+  const SAVE_ERROR_TEXT = `Das Speichern hat nicht geklappt. Bitte prüfe deine Internetverbindung und versuche es erneut. Wenn es weiterhin nicht klappt, melde dich bei ${CONTACT_EMAIL}.`;
 
   // ==== STATE ====
   const COURSES = ['Krebs', 'Seepferd', 'Frosch', 'Pinguin', 'Schwimmschule'];
@@ -1445,6 +1572,37 @@
   DAYS.forEach(d => state.days[d] = { checked: false, times: [{ from: '', to: '' }] });
 
   let currentStep = 1;
+
+  // ==== ZUGRIFF & SENDEN ====
+  const CODE_KEY = 'kursplanung_zugangscode';
+  function getCode() { try { return localStorage.getItem(CODE_KEY) || ''; } catch (e) { return ''; } }
+  function setCode(v) { try { localStorage.setItem(CODE_KEY, v); } catch (e) { /* ignorieren */ } }
+
+  function newId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  }
+
+  function apiUrl(action) {
+    return POWER_AUTOMATE_URL + '?action=' + action + '&code=' + encodeURIComponent(getCode()) + '&t=' + Date.now();
+  }
+
+  // Sendet Daten ans Google-Skript. Wirft einen Fehler bei Netzproblemen oder Zeitüberschreitung.
+  async function postToSheet(payload) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 20000);
+    try {
+      const response = await fetch(POWER_AUTOMATE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ ...payload, code: getCode() }),
+        signal: controller.signal
+      });
+      return await response.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 
   // ==== RENDER COURSES ====
   function renderCourseGrid(gridId, selected, onToggle, withCounts) {
@@ -1493,8 +1651,9 @@
   // Anzahl Einträge pro Kurs aus dem Google Sheet holen
   async function loadCounts() {
     try {
-      const response = await fetch(POWER_AUTOMATE_URL + '?action=kurse_zaehler&t=' + Date.now(), { cache: 'no-store' });
+      const response = await fetch(apiUrl('kurse_zaehler'), { cache: 'no-store' });
       const json = await response.json();
+      if (json && json.error === 'code') { requireCode(true); return; }
       if (!json || json.ok !== true || !json.counts) throw new Error('Unerwartete Antwort');
       counts = {};
       COURSES.forEach(c => { counts[c] = json.counts[c] || 0; });
@@ -1753,6 +1912,7 @@
     const timestamp = `${pad(now.getDate())}.${pad(now.getMonth()+1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
     const payload = {
+      id: (state.submitId = state.submitId || newId()),
       name: state.name,
       courses: state.selectedCourses.join(', '),
       role: state.role,
@@ -1761,19 +1921,22 @@
       timestamp: timestamp
     };
 
+    const errorBox = document.getElementById('submitError');
+    errorBox.classList.remove('show');
+    let result = null;
     try {
-      await fetch(POWER_AUTOMATE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
+      result = await postToSheet(payload);
     } catch (err) {
-      // Offline-Fallback: lokal speichern
-      try {
-        const queue = JSON.parse(localStorage.getItem('schwimmkurse_offline_queue') || '[]');
-        queue.push(payload);
-        localStorage.setItem('schwimmkurse_offline_queue', JSON.stringify(queue));
-      } catch (e) { /* localStorage nicht verfügbar */ }
+      console.warn('Senden fehlgeschlagen:', err);
+    }
+    if (!result || result.status !== 'ok') {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Erneut versuchen';
+      if (result && result.code) { requireCode(true); return; }
+      errorBox.textContent = SAVE_ERROR_TEXT;
+      errorBox.classList.add('show');
+      errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
     }
 
     // Zähler erhöhen
@@ -1819,6 +1982,7 @@
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = false;
     submitBtn.textContent = '✓ Eintragung bestätigen';
+    document.getElementById('submitError').classList.remove('show');
 
     document.getElementById('successScreen').classList.add('hidden');
 
@@ -2018,7 +2182,7 @@
 
   // ==== HILFSLEITUNG ====
   function newHlState() {
-    return { name: '', wish: null, courses: [], days: emptyDays(), remarks: '' };
+    return { name: '', wish: null, courses: [], days: emptyDays(), remarks: '', submitId: null };
   }
   let hlState = newHlState();
   const helperDays = createDaysWidget('hlDaysContainer', () => hlState.days);
@@ -2091,6 +2255,7 @@
 
     const payload = {
       action: 'hilfsleitung',
+      id: (hlState.submitId = hlState.submitId || newId()),
       name: hlState.name,
       wunschkurse: wunsch,
       times: times,
@@ -2098,18 +2263,22 @@
       timestamp: timestamp
     };
 
+    const saveError = document.getElementById('hlSaveError');
+    saveError.classList.remove('show');
+    let result = null;
     try {
-      await fetch(POWER_AUTOMATE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
+      result = await postToSheet(payload);
     } catch (err) {
-      try {
-        const queue = JSON.parse(localStorage.getItem('schwimmkurse_offline_queue') || '[]');
-        queue.push(payload);
-        localStorage.setItem('schwimmkurse_offline_queue', JSON.stringify(queue));
-      } catch (e) { /* localStorage nicht verfügbar */ }
+      console.warn('Senden fehlgeschlagen:', err);
+    }
+    if (!result || result.status !== 'ok') {
+      btn.disabled = false;
+      btn.textContent = 'Erneut versuchen';
+      if (result && result.code) { requireCode(true); return; }
+      saveError.textContent = SAVE_ERROR_TEXT;
+      saveError.classList.add('show');
+      saveError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
     }
 
     showReceipt({
@@ -2138,6 +2307,7 @@
     document.querySelectorAll('[data-wish]').forEach(el => el.classList.remove('selected'));
     document.getElementById('hlCourseWrap').classList.add('hidden');
     document.getElementById('hlError').classList.remove('show');
+    document.getElementById('hlSaveError').classList.remove('show');
     document.getElementById('hlNameField').classList.remove('has-error');
     const btn = document.getElementById('hlSubmit');
     btn.disabled = false;
@@ -2153,7 +2323,6 @@
   renderHlCourses();
 
   // ==== PRIVATKURSE (aus Google Sheet) ====
-  const PK_CODE_KEY = 'kursplanung_zugangscode';
   const PK_NAME_KEY = 'kursplanung_einschreiber_name';
   const ICON_PERSON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>';
   const ICON_WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3L12 4z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>';
@@ -2184,23 +2353,20 @@
     return kurs.felder[pkTitleIndex(kurs)].wert;
   }
 
-  async function loadPrivatkurse(code) {
+  async function loadPrivatkurse() {
     if (pkLoading) return;
     pkLoading = true;
     const refreshBtn = document.getElementById('pkRefresh');
     refreshBtn.classList.add('spinning');
-    if (code === undefined) code = pkGet(PK_CODE_KEY);
     pkSetBody('<div class="pk-status"><div class="pk-spinner"></div><p>Wird geladen …</p></div>');
     try {
-      const url = POWER_AUTOMATE_URL + '?action=privatkurse&code=' + encodeURIComponent(code) + '&t=' + Date.now();
-      const response = await fetch(url, { cache: 'no-store' });
+      const response = await fetch(apiUrl('privatkurse'), { cache: 'no-store' });
       const json = await response.json();
       if (json && json.error === 'code') {
-        pkRenderCodePrompt(!!code);
+        requireCode(true);
       } else if (json && json.error === 'tab') {
         pkSetBody(pkState(ICON_WARN, 'Tab nicht gefunden', 'Im Google Sheet wurde der Tab für die Privatkurse nicht gefunden.'));
       } else if (json && json.ok === true && Array.isArray(json.kurse)) {
-        if (code) pkSet(PK_CODE_KEY, code);
         pkKurse = json.kurse;
         pkRenderList();
       } else {
@@ -2215,22 +2381,6 @@
       pkLoading = false;
       refreshBtn.classList.remove('spinning');
     }
-  }
-
-  function pkRenderCodePrompt(wrong) {
-    pkSetBody(
-      pkState(ICON_LOCK, 'Zugangscode nötig', wrong
-        ? 'Der Code war nicht richtig. Bitte versuche es nochmals.'
-        : 'Gib den Zugangscode ein, um die Privatkurse zu sehen.') +
-      `<div class="field pk-code">
-        <label for="pkCodeInput">Zugangscode</label>
-        <input type="text" id="pkCodeInput" autocomplete="off" autocapitalize="off" autocorrect="off">
-      </div>
-      <div class="btn-row"><button type="button" class="btn-primary" id="pkCodeBtn">Öffnen</button></div>`);
-    const input = document.getElementById('pkCodeInput');
-    const go = () => { const v = input.value.trim(); if (v) loadPrivatkurse(v); };
-    document.getElementById('pkCodeBtn').addEventListener('click', go);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
   }
 
   const ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M8 3v4M16 3v4"/></svg>';
@@ -2322,33 +2472,31 @@
     pkSet(PK_NAME_KEY, name);
     const payload = {
       action: 'privat_einschreibung',
-      code: pkGet(PK_CODE_KEY),
       name: name,
       kurs: pkTitle(kurs),
       zeile: kurs.id,
       remarks: card.querySelector('.pk-remarks').value.trim()
     };
+    let result = null;
     try {
-      const response = await fetch(POWER_AUTOMATE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-      const result = await response.json();
-      if (result.status === 'ok') {
-        kurs.eingeschrieben = name;
-        pkMarkTaken(card, name, true);
-      } else if (result.status === 'vergeben') {
-        kurs.eingeschrieben = result.name || '?';
-        pkMarkTaken(card, kurs.eingeschrieben, false);
-      } else if (result.status === 'geaendert') {
-        loadPrivatkurse();
-      } else {
-        throw new Error(result.message || 'Fehler');
-      }
+      result = await postToSheet(payload);
     } catch (err) {
       console.warn('Einschreibung fehlgeschlagen:', err);
-      errEl.textContent = 'Das Senden hat nicht geklappt. Bitte versuche es nochmals.';
+    }
+    if (result && result.status === 'ok') {
+      kurs.eingeschrieben = name;
+      pkMarkTaken(card, name, true);
+    } else if (result && result.status === 'vergeben') {
+      kurs.eingeschrieben = result.name || '?';
+      pkMarkTaken(card, kurs.eingeschrieben, false);
+    } else if (result && result.status === 'geaendert') {
+      loadPrivatkurse();
+    } else if (result && result.code) {
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Absenden';
+      requireCode(true);
+    } else {
+      errEl.textContent = SAVE_ERROR_TEXT;
       errEl.classList.add('show');
       sendBtn.disabled = false;
       sendBtn.textContent = 'Absenden';
@@ -2403,7 +2551,7 @@
   ];
 
   const ALL_SECTIONS = SECTIONS.flatMap(sec => [sec, ...(sec.children || [])]);
-  const VIEW_IDS = ['start', ...ALL_SECTIONS.map(sec => sec.id)];
+  const VIEW_IDS = ['start', ...ALL_SECTIONS.map(sec => sec.id), 'datenschutz', 'gate'];
   const menuBtn = document.getElementById('menuBtn');
   const menuPop = document.getElementById('menuPop');
 
@@ -2452,7 +2600,7 @@
 
   function showView(id) {
     VIEW_IDS.forEach(v => document.getElementById('view-' + v).classList.toggle('hidden', v !== id));
-    menuBtn.classList.toggle('hidden', id === 'start');
+    menuBtn.classList.toggle('hidden', id === 'start' || id === 'gate');
     renderMenu(id);
     closeMenu();
     window.scrollTo(0, 0);
@@ -2460,9 +2608,74 @@
     if (id === 'hauptleitung') loadCounts();
   }
 
+  // ==== ZUGANGSCODE-BILDSCHIRM ====
+  let unlocked = true; // false, solange der Code-Bildschirm offen ist
+
+  async function checkAccess(code) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    try {
+      const url = POWER_AUTOMATE_URL + '?action=ping&code=' + encodeURIComponent(code) + '&t=' + Date.now();
+      const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
+      const json = await response.json();
+      if (json && json.ok === true) return 'ok';
+      if (json && json.error === 'code') return 'code';
+      return 'unknown';
+    } catch (err) {
+      return 'unknown';
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function showGate(wrong) {
+    unlocked = false;
+    showView('gate');
+    const input = document.getElementById('gateInput');
+    const err = document.getElementById('gateError');
+    input.value = '';
+    err.textContent = wrong ? 'Der Code ist nicht (mehr) gültig. Bitte gib ihn erneut ein.' : '';
+    err.classList.toggle('show', !!wrong);
+    input.focus();
+  }
+
+  function requireCode(wrong) {
+    setCode('');
+    showGate(wrong);
+  }
+
+  async function tryGate() {
+    const input = document.getElementById('gateInput');
+    const err = document.getElementById('gateError');
+    const btn = document.getElementById('gateBtn');
+    const value = input.value.trim();
+    if (!value) return;
+    btn.disabled = true;
+    const status = await checkAccess(value);
+    btn.disabled = false;
+    if (status === 'ok') {
+      setCode(value);
+      unlocked = true;
+      route();
+    } else {
+      err.textContent = status === 'code'
+        ? 'Der Code war nicht richtig. Bitte versuche es nochmals.'
+        : 'Keine Verbindung. Bitte versuche es erneut.';
+      err.classList.add('show');
+    }
+  }
+
+  document.getElementById('gateBtn').addEventListener('click', tryGate);
+  document.getElementById('gateInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') tryGate();
+  });
+
   function route() {
     const id = location.hash.replace('#', '');
-    showView(VIEW_IDS.includes(id) ? id : 'start');
+    const target = VIEW_IDS.includes(id) && id !== 'gate' ? id : 'start';
+    // Solange der Code fehlt, ist nur der Datenschutz erreichbar
+    if (!unlocked && target !== 'datenschutz') { showView('gate'); return; }
+    showView(target);
   }
 
   menuBtn.addEventListener('click', e => {
@@ -2478,9 +2691,17 @@
   });
   window.addEventListener('hashchange', route);
 
+  document.querySelectorAll('.js-contact').forEach(a => {
+    a.href = 'mailto:' + CONTACT_EMAIL;
+    a.textContent = CONTACT_EMAIL;
+  });
   renderHome();
   renderChoose();
   route();
+  // Zugangscode im Hintergrund prüfen (der Server prüft ihn bei jeder Anfrage zusätzlich)
+  checkAccess(getCode()).then(status => {
+    if (status === 'code') requireCode(!!getCode());
+  });
   // ==== EINBLENDER: ZUM HOME-BILDSCHIRM ====
   (function setupInstallHint() {
     const KEY = 'kursplanung_install_hint_session';
