@@ -1396,6 +1396,7 @@
     border-color: transparent;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 6px 14px rgba(23,36,142,.3);
   }
+  .sub-label { display: block; margin: 14px 0 6px; font-size: 0.92rem; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -1475,11 +1476,36 @@
       <div id="step2" class="hidden">
         <h2 class="section-title">Deine Angaben</h2>
         <div class="banner error" id="step2Error"></div>
+        <div class="info-box">Kurse starten ab Mittwoch bis Samstag in der 2. Woche, an den anderen Tagen in der 3. Woche. Den Start kannst du selber bestimmen.</div>
 
         <div class="field" id="nameField">
           <label for="nameInput">Dein Name *</label>
           <input type="text" id="nameInput" placeholder="Vor- und Nachname" autocomplete="name">
           <div class="error-msg" id="nameError">⚠ Bitte gib deinen Namen ein.</div>
+        </div>
+
+        <div class="field" id="startField">
+          <label>Kannst du zum vorgesehenen Start beginnen? *</label>
+          <div class="radio-group" id="startGroup">
+            <label class="radio-option"><input type="radio" name="startOk" value="ja"> Ja</label>
+            <label class="radio-option"><input type="radio" name="startOk" value="nein"> Nein</label>
+          </div>
+          <div id="startWrap" class="hidden">
+            <label for="startWeek" class="sub-label">Wann möchtest du starten? *</label>
+            <input type="text" id="startWeek" placeholder="z. B. 4. Woche, ab 21.01.2027">
+          </div>
+        </div>
+
+        <div class="field" id="blockField">
+          <label>Hast du schon Tage, an denen du nicht kannst? *</label>
+          <div class="radio-group" id="blockGroup">
+            <label class="radio-option"><input type="radio" name="blockYn" value="ja"> Ja</label>
+            <label class="radio-option"><input type="radio" name="blockYn" value="nein"> Nein</label>
+          </div>
+          <div id="blockWrap" class="hidden">
+            <label for="blockDays" class="sub-label">An welchen Tagen kannst du nicht? *</label>
+            <input type="text" id="blockDays" placeholder="z. B. 14.01.2027, 21.01.2027">
+          </div>
         </div>
 
         <div class="field">
@@ -1527,6 +1553,7 @@
         <div id="hlForm">
           <h2 class="section-title">Assistenz</h2>
           <div class="info-box">ℹ️ Gib an, wann du Zeit hast und ob du einen Wunschkurs hast.</div>
+          <div class="info-box">Kurse starten ab Mittwoch bis Samstag in der 2. Woche, an den anderen Tagen in der 3. Woche. Den Start kannst du selber bestimmen.</div>
           <div class="banner error" id="hlError"></div>
 
           <div class="field" id="hlNameField">
@@ -2073,8 +2100,37 @@
       errorBanner.classList.add('show');
       return;
     }
+    const startOk = (document.querySelector('input[name="startOk"]:checked') || {}).value || '';
+    const blockYn = (document.querySelector('input[name="blockYn"]:checked') || {}).value || '';
+    const startWeek = document.getElementById('startWeek').value.trim();
+    const blockDays = document.getElementById('blockDays').value.trim();
+    let msg = '';
+    if (!startOk) msg = '⚠ Bitte gib an, ob du zum vorgesehenen Start beginnen kannst.';
+    else if (startOk === 'nein' && !startWeek) msg = '⚠ Bitte gib an, wann du starten möchtest.';
+    else if (!blockYn) msg = '⚠ Bitte gib an, ob du schon Tage hast, an denen du nicht kannst.';
+    else if (blockYn === 'ja' && !blockDays) msg = '⚠ Bitte gib an, an welchen Tagen du nicht kannst.';
+    if (msg) {
+      errorBanner.textContent = msg;
+      errorBanner.classList.add('show');
+      return;
+    }
+    state.startOk = startOk; state.startWeek = startWeek;
+    state.blockYn = blockYn; state.blockDays = blockDays;
     goToStep(3);
   }
+
+  // ==== START UND NICHT-VERFÜGBARE TAGE ====
+  const START_DATUM = '7.01.2027';
+  function startText() { return state.startOk === 'ja' ? 'Ja, zum vorgesehenen Start' : `Nein, ich starte: ${state.startWeek}`; }
+  function blockText() { return state.blockYn === 'ja' ? state.blockDays : 'Keine'; }
+
+  document.addEventListener('change', e => {
+    const inp = e.target;
+    if (inp.name !== 'startOk' && inp.name !== 'blockYn') return;
+    inp.closest('.radio-group').querySelectorAll('.radio-option').forEach(l => l.classList.toggle('selected', l.contains(document.querySelector(`input[name="${inp.name}"]:checked`))));
+    const wrap = document.getElementById(inp.name === 'startOk' ? 'startWrap' : 'blockWrap');
+    wrap.classList.toggle('hidden', inp.value !== (inp.name === 'startOk' ? 'nein' : 'ja'));
+  });
 
   // ==== SUMMARY ====
   function renderSummary() {
@@ -2095,6 +2151,14 @@
       <div class="summary-block">
         <h3>Gewählte Kurse und Zeiten</h3>
         ${timesHtml}
+      </div>
+      <div class="summary-block">
+        <h3>Start</h3>
+        <p>${escapeHtml(startText())}</p>
+      </div>
+      <div class="summary-block">
+        <h3>Tage, an denen du nicht kannst</h3>
+        <p>${escapeHtml(blockText())}</p>
       </div>
       <div class="summary-block">
         <h3>Bemerkung</h3>
@@ -2130,6 +2194,8 @@
       courses: state.selectedCourses.join(', '),
       role: state.role,
       slotsText: slotsText,
+      start: startText(),
+      absenzen: blockText(),
       remarks: state.remarks || '',
       timestamp: timestamp
     };
@@ -2159,6 +2225,10 @@
       role: state.role,
       timesLabel: 'Gewählte Kurse und Zeiten',
       days: state.selectedCourses.map(c => ({ day: c, times: chosenSlotTexts(c) })),
+      extra: [
+        { label: 'Start', lines: [startText()] },
+        { label: 'Tage, an denen du nicht kannst', lines: [blockText()] }
+      ],
       remarks: state.remarks || '',
       timestamp: timestamp.slice(0, 16)
     };
@@ -2177,11 +2247,18 @@
       avail: {},
       name: '',
       role: 'Hauptleitung',
-      remarks: ''
+      remarks: '',
+      startOk: '', startWeek: '', blockYn: '', blockDays: ''
     };
 
     document.getElementById('nameInput').value = '';
     document.getElementById('remarksInput').value = '';
+    document.getElementById('startWeek').value = '';
+    document.getElementById('blockDays').value = '';
+    document.querySelectorAll('#startGroup input, #blockGroup input').forEach(i => { i.checked = false; });
+    document.querySelectorAll('#startGroup .radio-option, #blockGroup .radio-option').forEach(l => l.classList.remove('selected'));
+    document.getElementById('startWrap').classList.add('hidden');
+    document.getElementById('blockWrap').classList.add('hidden');
 
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = false;
@@ -2209,6 +2286,7 @@
       { label: 'Dein Name', lines: [snap.name] },
       { label: 'Deine Rolle', lines: [snap.role || ''] },
       { label: snap.timesLabel || 'Verfügbare Tage und Zeiten', lines: snap.days.map(d => d.day + ': ' + d.times.join(', ')) },
+      ...(snap.extra || []),
       { label: 'Bemerkung', lines: [snap.remarks ? snap.remarks : '(keine Bemerkung)'] }
     ].filter(b => !b.skip);
 
