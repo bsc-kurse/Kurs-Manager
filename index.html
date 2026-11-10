@@ -1588,6 +1588,24 @@
             </div>
           </div>
 
+          <div class="field" id="hlCountField">
+            <label>Wie viele Kurse möchtest du machen? *</label>
+            <div class="pk-days" id="hlCounts">
+              <button type="button" class="pk-day hl-count" data-n="1" aria-pressed="false">1</button>
+              <button type="button" class="pk-day hl-count" data-n="2" aria-pressed="false">2</button>
+              <button type="button" class="pk-day hl-count" data-n="3" aria-pressed="false">3</button>
+              <button type="button" class="pk-day hl-count" data-n="4" aria-pressed="false">4</button>
+              <button type="button" class="pk-day hl-count" data-n="5 oder mehr" aria-pressed="false">5+</button>
+            </div>
+            <div id="hlMultiWrap" class="hidden">
+              <label class="sub-label">Auch an mehreren Tagen? *</label>
+              <div class="radio-group" id="hlMultiGroup">
+                <label class="radio-option"><input type="radio" name="hlMulti" value="Ja"> Ja</label>
+                <label class="radio-option"><input type="radio" name="hlMulti" value="Nein"> Nein</label>
+              </div>
+            </div>
+          </div>
+
           <div class="field">
             <label for="hlRemarks">Bemerkung</label>
             <textarea id="hlRemarks" placeholder="Weitere Informationen, Anforderungen oder Anmerkungen..."></textarea>
@@ -2468,7 +2486,7 @@
 
   // ==== HILFSLEITUNG ====
   function newHlState() {
-    return { name: '', wish: null, courses: [], days: emptyDays(), remarks: '', submitId: null };
+    return { name: '', wish: null, courses: [], days: emptyDays(), remarks: '', submitId: null, count: '', multi: '' };
   }
   let hlState = newHlState();
   const helperDays = createDaysWidget('hlDaysContainer', () => hlState.days);
@@ -2496,6 +2514,27 @@
     }
   });
 
+  document.getElementById('hlCounts').addEventListener('click', e => {
+    const b = e.target.closest('.hl-count');
+    if (!b) return;
+    hlState.count = b.dataset.n;
+    document.querySelectorAll('.hl-count').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const several = hlState.count !== '1';
+    document.getElementById('hlMultiWrap').classList.toggle('hidden', !several);
+    if (!several) {
+      hlState.multi = '';
+      document.querySelectorAll('input[name="hlMulti"]').forEach(r => { r.checked = false; });
+      document.querySelectorAll('#hlMultiGroup .radio-option').forEach(l => l.classList.remove('selected'));
+    }
+  });
+
+  document.addEventListener('change', e => {
+    if (e.target.name !== 'hlMulti') return;
+    hlState.multi = e.target.value;
+    document.querySelectorAll('#hlMultiGroup .radio-option').forEach(l =>
+      l.classList.toggle('selected', l.contains(e.target)));
+  });
+
   async function submitHilfsleitung() {
     hlState.name = document.getElementById('hlName').value.trim();
     hlState.remarks = document.getElementById('hlRemarks').value.trim();
@@ -2517,6 +2556,10 @@
       error = '⚠ Bitte gib an, ob du einen Wunschkurs hast.';
     } else if (hlState.wish === 'ja' && hlState.courses.length === 0) {
       error = '⚠ Bitte wähle mindestens einen Wunschkurs aus.';
+    } else if (!hlState.count) {
+      error = '⚠ Bitte gib an, wie viele Kurse du machen möchtest.';
+    } else if (hlState.count !== '1' && !hlState.multi) {
+      error = '⚠ Bitte gib an, ob du auch an mehreren Tagen kannst.';
     }
     if (error) {
       banner.textContent = error;
@@ -2544,6 +2587,8 @@
       id: (hlState.submitId = hlState.submitId || newId()),
       name: hlState.name,
       wunschkurse: wunsch,
+      anzahl: hlState.count,
+      mehrereTage: hlState.count === '1' ? 'Nein (nur 1 Kurs)' : hlState.multi,
       times: times,
       remarks: hlState.remarks,
       timestamp: timestamp
@@ -2576,6 +2621,10 @@
         day: d,
         times: hlState.days[d].times.map(t => `${t.from} - ${t.to}`)
       })),
+      extra: [
+        { label: 'Anzahl Kurse', lines: [hlState.count] },
+        { label: 'Auch an mehreren Tagen', lines: [hlState.count === '1' ? 'Nein (nur 1 Kurs)' : hlState.multi] }
+      ],
       remarks: hlState.remarks,
       timestamp: timestamp.slice(0, 16)
     }, 'hilfs', 'hlReceiptPreview', 'hlSaveBtn');
@@ -2592,6 +2641,10 @@
     document.querySelectorAll('input[name="hlWish"]').forEach(r => { r.checked = false; });
     document.querySelectorAll('[data-wish]').forEach(el => el.classList.remove('selected'));
     document.getElementById('hlCourseWrap').classList.add('hidden');
+    document.querySelectorAll('.hl-count').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    document.querySelectorAll('input[name="hlMulti"]').forEach(r => { r.checked = false; });
+    document.querySelectorAll('#hlMultiGroup .radio-option').forEach(l => l.classList.remove('selected'));
+    document.getElementById('hlMultiWrap').classList.add('hidden');
     document.getElementById('hlError').classList.remove('show');
     document.getElementById('hlSaveError').classList.remove('show');
     document.getElementById('hlNameField').classList.remove('has-error');
