@@ -1398,11 +1398,11 @@
   }
   .sub-label { display: block; margin: 14px 0 6px; font-size: 0.92rem; font-weight: 500; }
 
-  .pk-ask { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--hairline); }
-  .pk-ask-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-  .pk-ask-sub { font-size: 0.92rem; color: var(--text-medium); margin-bottom: 16px; }
-  .pk-ask-done { text-align: center; padding: 8px 0; }
-  .pk-ask-done p { margin: 4px 0 14px; color: var(--text-medium); }
+  .pk-actions { gap: 10px; flex-wrap: wrap; }
+  .pk-ask-form { margin-top: 12px; }
+  .pk-ask-form .field { margin-bottom: 14px; }
+  .pk-ask-form textarea { min-height: 72px; }
+  .pk-ask-done { margin-top: 12px; padding: 12px 14px; border-radius: 16px; background: var(--glass-strong); border: 1px solid var(--glass-edge); font-size: 0.92rem; }
 </style>
 </head>
 <body>
@@ -1625,34 +1625,6 @@
           </button>
         </div>
         <div id="pkBody"></div>
-
-        <div class="pk-ask" id="pkAsk">
-          <div id="pkAskForm">
-            <h3 class="pk-ask-title">Hast du eine Frage?</h3>
-            <p class="pk-ask-sub">Stell sie hier, die Kursorganisation antwortet dir.</p>
-            <div class="field" id="pkQField">
-              <label for="pkQ">Deine Frage *</label>
-              <textarea id="pkQ" maxlength="1000" placeholder="Schreib hier deine Frage zu den Privatkursen..."></textarea>
-            </div>
-            <div class="field">
-              <label for="pkQName">Dein Name *</label>
-              <input type="text" id="pkQName" placeholder="Vor- und Nachname" autocomplete="name">
-            </div>
-            <div class="field">
-              <label for="pkQContact">E-Mail oder Telefon *</label>
-              <input type="text" id="pkQContact" placeholder="Damit wir dir antworten können" autocomplete="email">
-            </div>
-            <div class="banner error" id="pkQError"></div>
-            <div class="btn-row">
-              <button type="button" class="btn-primary" id="pkQSend" onclick="sendPkQuestion()">Frage senden</button>
-            </div>
-          </div>
-          <div id="pkAskDone" class="pk-ask-done hidden">
-            <strong>Danke, deine Frage ist angekommen.</strong>
-            <p>Die Kursorganisation meldet sich bei dir.</p>
-            <button type="button" class="btn-secondary" onclick="resetPkQuestion()">Weitere Frage stellen</button>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -1693,7 +1665,7 @@
         <ul>
           <li><strong>Kurseinteilung (Hauptleitung und Assistenz):</strong> Name, gewählte Kurse bzw. Wunschkurs, Rolle, verfügbare Tage und Zeiten, Bemerkung und der Zeitpunkt deiner Eintragung.</li>
           <li><strong>Privatkurse:</strong> Du siehst Anfragen mit Angaben wie Name, Alter, Schwimmerfahrung und Wünschen. Wenn du dich einschreibst, speichern wir deinen Namen und deine Bemerkung.</li>
-          <li><strong>Fragen zu Privatkursen:</strong> Deine Frage, dein Name und deine E-Mail oder Telefonnummer, damit wir dir antworten können.</li>
+          <li><strong>Fragen zu Privatkursen:</strong> Deine Frage und dein Name, damit die Kursorganisation sie dem richtigen Kurs zuordnen kann.</li>
         </ul>
 
         <h3>Wofür verwenden wir die Daten?</h3>
@@ -2648,57 +2620,6 @@
   function pkGet(key) { try { return localStorage.getItem(key) || ''; } catch (e) { return ''; } }
   function pkSet(key, val) { try { localStorage.setItem(key, val); } catch (e) { /* ignorieren */ } }
 
-  // ==== FRAGEN ZU PRIVATKURSEN ====
-  let pkQuestionId = '';
-
-  async function sendPkQuestion() {
-    const q = document.getElementById('pkQ').value.trim();
-    const name = document.getElementById('pkQName').value.trim();
-    const banner = document.getElementById('pkQError');
-    const btn = document.getElementById('pkQSend');
-    banner.classList.remove('show');
-    const contact = document.getElementById('pkQContact').value.trim();
-    if (!q || !name || !contact) {
-      banner.textContent = !q ? '⚠ Bitte schreib deine Frage ins Textfeld.' : !name ? '⚠ Bitte gib deinen Namen ein.' : '⚠ Bitte gib eine E-Mail oder Telefonnummer an.';
-      banner.classList.add('show');
-      return;
-    }
-    btn.disabled = true;
-    btn.textContent = 'Wird gesendet…';
-    let result = null;
-    try {
-      result = await postToSheet({
-        action: 'privat_frage',
-        id: (pkQuestionId = pkQuestionId || newId()),
-        name: name,
-        kontakt: contact,
-        frage: q,
-        timestamp: new Date().toLocaleString('de-CH')
-      });
-    } catch (err) {
-      console.warn('Senden fehlgeschlagen:', err);
-    }
-    btn.disabled = false;
-    if (!result || result.status !== 'ok') {
-      btn.textContent = 'Erneut versuchen';
-      if (result && result.code) { requireCode(true); return; }
-      banner.textContent = SAVE_ERROR_TEXT;
-      banner.classList.add('show');
-      return;
-    }
-    btn.textContent = 'Frage senden';
-    document.getElementById('pkAskForm').classList.add('hidden');
-    document.getElementById('pkAskDone').classList.remove('hidden');
-  }
-
-  function resetPkQuestion() {
-    pkQuestionId = '';
-    document.getElementById('pkQ').value = '';
-    document.getElementById('pkQContact').value = '';
-    document.getElementById('pkAskDone').classList.add('hidden');
-    document.getElementById('pkAskForm').classList.remove('hidden');
-  }
-
   function pkSetBody(html) { document.getElementById('pkBody').innerHTML = html; }
 
   function pkState(icon, title, text, extra) {
@@ -2781,6 +2702,7 @@
     const form = card.querySelector('.pk-enroll');
     if (actions) actions.remove();
     if (form) form.remove();
+    card.querySelectorAll('.pk-ask-form, .pk-ask-done').forEach(el => el.remove());
     card.classList.add('taken');
     card.insertAdjacentHTML('beforeend', pkTakenHtml(name, mine));
   }
@@ -2803,7 +2725,26 @@
             <input type="text" class="pk-wish" placeholder="Uhrzeit, z. B. ab 16 Uhr" aria-label="Wunschzeit">
           </div>`;
     const enrollHtml = taken ? pkTakenHtml(kurs.eingeschrieben, false) : `
-        <div class="pk-actions"><button type="button" class="btn-primary btn-sm pk-open">Einschreiben</button></div>
+        <div class="pk-actions">
+          <button type="button" class="btn-primary btn-sm pk-open">Einschreiben</button>
+          <button type="button" class="btn-secondary btn-sm pk-ask-open">Frage stellen</button>
+        </div>
+        <div class="pk-ask-form hidden">
+          <div class="field">
+            <label>Deine Frage *</label>
+            <textarea class="pk-q" maxlength="1000" placeholder="Schreib hier deine Frage zu diesem Kurs..."></textarea>
+          </div>
+          <div class="field">
+            <label>Dein Name *</label>
+            <input type="text" class="pk-q-name" autocomplete="name">
+          </div>
+          <p class="error-msg pk-q-error"></p>
+          <div class="pk-form-actions">
+            <button type="button" class="btn-secondary btn-sm pk-ask-cancel">Abbrechen</button>
+            <button type="button" class="btn-primary btn-sm pk-ask-send">Frage senden</button>
+          </div>
+        </div>
+        <div class="pk-ask-done hidden"><strong>Danke, deine Frage ist angekommen.</strong> Die Kursorganisation meldet sich bei dir.</div>
         <div class="pk-enroll hidden">
           <div class="field">
             <label>Dein Name *</label>
@@ -2827,6 +2768,51 @@
         ${wishes.length ? `<div class="pk-wishes">${wishes.map(pkRowHtml).join('')}</div>` : ''}
         ${enrollHtml}
       </div>`;
+  }
+
+  async function pkSendQuestion(card) {
+    const kurs = pkKurse[Number(card.dataset.index)];
+    const errEl = card.querySelector('.pk-q-error');
+    const btn = card.querySelector('.pk-ask-send');
+    const frage = card.querySelector('.pk-q').value.trim();
+    const name = card.querySelector('.pk-q-name').value.trim();
+    if (!frage || !name) {
+      errEl.textContent = !frage ? 'Bitte schreib deine Frage ins Textfeld.' : 'Bitte gib deinen Namen ein.';
+      errEl.classList.add('show');
+      return;
+    }
+    errEl.classList.remove('show');
+    btn.disabled = true;
+    btn.textContent = 'Wird gesendet …';
+    pkSet(PK_NAME_KEY, name);
+    card.dataset.qid = card.dataset.qid || newId();
+    let result = null;
+    try {
+      result = await postToSheet({
+        action: 'privat_frage',
+        id: card.dataset.qid,
+        kurs: pkTitle(kurs),
+        name: name,
+        frage: frage,
+        timestamp: new Date().toLocaleString('de-CH')
+      });
+    } catch (err) {
+      console.warn('Senden fehlgeschlagen:', err);
+    }
+    btn.disabled = false;
+    if (!result || result.status !== 'ok') {
+      btn.textContent = 'Erneut versuchen';
+      if (result && result.code) { requireCode(true); return; }
+      errEl.textContent = SAVE_ERROR_TEXT;
+      errEl.classList.add('show');
+      return;
+    }
+    btn.textContent = 'Frage senden';
+    card.querySelector('.pk-q').value = '';
+    delete card.dataset.qid;
+    card.querySelector('.pk-ask-form').classList.add('hidden');
+    card.querySelector('.pk-ask-done').classList.remove('hidden');
+    card.querySelector('.pk-actions').classList.remove('hidden');
   }
 
   async function pkSendEnroll(card) {
@@ -2900,6 +2886,16 @@
       card.querySelector('.pk-actions').classList.remove('hidden');
     } else if (e.target.closest('.pk-send')) {
       pkSendEnroll(card);
+    } else if (e.target.closest('.pk-ask-open')) {
+      card.querySelector('.pk-actions').classList.add('hidden');
+      card.querySelector('.pk-ask-form').classList.remove('hidden');
+      const n = card.querySelector('.pk-q-name');
+      if (!n.value) n.value = pkGet(PK_NAME_KEY);
+    } else if (e.target.closest('.pk-ask-cancel')) {
+      card.querySelector('.pk-ask-form').classList.add('hidden');
+      card.querySelector('.pk-actions').classList.remove('hidden');
+    } else if (e.target.closest('.pk-ask-send')) {
+      pkSendQuestion(card);
     }
   });
 
