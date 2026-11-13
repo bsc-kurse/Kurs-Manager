@@ -1244,8 +1244,8 @@
   #homeTiles .tile-title { font-size: 1.05rem; line-height: 1.25; }
 
   /* Auswahl Haupt-/Hilfsleitung: breite Zeilen mit Beschreibung */
-  #chooseTiles .home-tile, #roleTiles .home-tile { padding: 22px 20px; }
-  #chooseTiles .tile-title, #roleTiles .tile-title { font-size: 1.15rem; }
+  #chooseTiles .home-tile { padding: 22px 20px; }
+  #chooseTiles .tile-title { font-size: 1.15rem; }
 
   .course-block { display: flex; flex-direction: column; gap: 8px; }
 
@@ -1403,12 +1403,6 @@
   .pk-ask-form .field { margin-bottom: 14px; }
   .pk-ask-form textarea { min-height: 72px; }
   .pk-ask-done { margin-top: 12px; padding: 12px 14px; border-radius: 16px; background: var(--glass-strong); border: 1px solid var(--glass-edge); font-size: 0.92rem; }
-
-  .pk-abo { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--hairline); }
-  .pk-abo-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
-  .pk-abo-sub { font-size: 0.92rem; color: var(--text-medium); margin-bottom: 14px; }
-  .pk-abo-on { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; font-size: 0.92rem; }
-  .pk-abo-on span { color: var(--text-medium); word-break: break-all; }
 </style>
 </head>
 <body>
@@ -1430,17 +1424,6 @@
         <h2 class="section-title">Was möchtest du tun?</h2>
         <p class="choose-text">Willkommen im Kurs-Manager des BSC.</p>
         <div class="home-grid" id="homeTiles"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ROLLE WÄHLEN -->
-  <section id="view-rolle" class="view hidden">
-    <div class="card">
-      <div class="content">
-        <h2 class="section-title">Wer bist du?</h2>
-        <p class="choose-text">Wähle deine Rolle. Du kannst sie später jederzeit wechseln.</p>
-        <div class="home-grid" id="roleTiles"></div>
       </div>
     </div>
   </section>
@@ -1660,26 +1643,6 @@
           </button>
         </div>
         <div id="pkBody"></div>
-
-        <div class="pk-abo">
-          <div id="pkAboForm">
-            <h3 class="pk-abo-title">Neue Privatkurse per E-Mail</h3>
-            <p class="pk-abo-sub">Wir schreiben dir, sobald ein neuer Privatkurs online ist.</p>
-            <div class="field">
-              <label for="pkAboMail">Deine E-Mail *</label>
-              <input type="email" id="pkAboMail" placeholder="name@beispiel.ch" autocomplete="email" inputmode="email">
-            </div>
-            <p class="error-msg" id="pkAboErr"></p>
-            <div class="btn-row">
-              <button type="button" class="btn-secondary btn-sm" id="pkAboBtn">Benachrichtigung aktivieren</button>
-            </div>
-          </div>
-          <div id="pkAboOn" class="pk-abo-on hidden">
-            <strong>Benachrichtigung ist aktiv</strong>
-            <span id="pkAboShown"></span>
-            <button type="button" class="btn-secondary btn-sm" id="pkAboOff">Abmelden</button>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -1710,8 +1673,6 @@
 
   <footer class="app-footer">
     <span>Kontakt: <a class="js-contact"></a></span>
-    <span aria-hidden="true" class="js-role-sep">·</span>
-    <a href="#rolle" class="js-role-link">Rolle wechseln</a>
   </footer>
 
 </div>
@@ -2954,61 +2915,6 @@
 
   document.getElementById('pkRefresh').addEventListener('click', () => loadPrivatkurse());
 
-  // ==== BENACHRICHTIGUNG BEI NEUEN PRIVATKURSEN (E-Mail) ====
-  const ABO_KEY = 'kursplanung_abo_email';
-
-  function renderAbo() {
-    const mail = pkGet(ABO_KEY);
-    document.getElementById('pkAboForm').classList.toggle('hidden', !!mail);
-    document.getElementById('pkAboOn').classList.toggle('hidden', !mail);
-    document.getElementById('pkAboShown').textContent = mail;
-  }
-
-  async function aboSend(action, mail, btn, label) {
-    const err = document.getElementById('pkAboErr');
-    err.classList.remove('show');
-    btn.disabled = true;
-    btn.textContent = 'Wird gesendet …';
-    let result = null;
-    try {
-      result = await postToSheet({ action: action, id: newId(), email: mail, timestamp: new Date().toLocaleString('de-CH') });
-    } catch (e) { console.warn('Senden fehlgeschlagen:', e); }
-    btn.disabled = false;
-    btn.textContent = label;
-    if (!result || result.status !== 'ok') {
-      if (result && result.code) { requireCode(true); return false; }
-      err.textContent = SAVE_ERROR_TEXT;
-      err.classList.add('show');
-      return false;
-    }
-    return true;
-  }
-
-  document.getElementById('pkAboBtn').addEventListener('click', async () => {
-    const mail = document.getElementById('pkAboMail').value.trim();
-    const err = document.getElementById('pkAboErr');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) {
-      err.textContent = 'Bitte gib eine gültige E-Mail-Adresse ein.';
-      err.classList.add('show');
-      return;
-    }
-    if (await aboSend('abo', mail, document.getElementById('pkAboBtn'), 'Benachrichtigung aktivieren')) {
-      pkSet(ABO_KEY, mail);
-      renderAbo();
-    }
-  });
-
-  document.getElementById('pkAboOff').addEventListener('click', async () => {
-    if (await aboSend('abo_ende', pkGet(ABO_KEY), document.getElementById('pkAboOff'), 'Abmelden')) {
-      pkSet(ABO_KEY, '');
-      document.getElementById('pkAboMail').value = '';
-      renderAbo();
-    }
-  });
-  renderAbo();
-
-
-
   // ==== NAVIGATION (Startseite + Bereiche) ====
   // Neuen Bereich hinzufügen: hier einen Eintrag ergänzen UND im HTML eine
   // <section id="view-DEINE-ID" class="view hidden"> anlegen.
@@ -3039,26 +2945,7 @@
   ];
 
   const ALL_SECTIONS = SECTIONS.flatMap(sec => [sec, ...(sec.children || [])]);
-  const VIEW_IDS = ['start', ...ALL_SECTIONS.map(sec => sec.id), 'gate', 'rolle'];
-
-  // ==== ROLLE (Hauptleitung oder Assistenz) ====
-  // Die Rolle blendet nur Bereiche aus; sie ist kein Zugriffsschutz (den gibt der Zugangscode).
-  const ROLE_KEY = 'kursplanung_rolle';
-  const ROLES = [
-    { id: 'hauptleitung', title: 'Hauptleitung', sub: 'Kurse übernehmen und Privatkurse ansehen', icon: ICON_LEAD },
-    { id: 'assistenz', title: 'Assistenz', sub: 'Zeiten und Wunschkurs angeben', icon: ICON_HELP }
-  ];
-  function getRole() { try { const r = localStorage.getItem(ROLE_KEY); return r === 'assistenz' || r === 'hauptleitung' ? r : ''; } catch (e) { return ''; } }
-  function setRole(r) { try { if (r) localStorage.setItem(ROLE_KEY, r); else localStorage.removeItem(ROLE_KEY); } catch (e) { /* ignorieren */ } }
-
-  // Sichtbare Bereiche je Rolle (Hauptleitung: ohne Auswahlseite, direkt zum Formular)
-  function visibleSections() {
-    if (getRole() === 'assistenz') return [];
-    return [
-      { id: 'hauptleitung', title: 'Kurseinteilung', sub: 'Für einen Kurs eintragen', icon: SECTIONS[0].icon },
-      SECTIONS[1]
-    ];
-  }
+  const VIEW_IDS = ['start', ...ALL_SECTIONS.map(sec => sec.id), 'gate'];
   const menuBtn = document.getElementById('menuBtn');
   const menuPop = document.getElementById('menuPop');
 
@@ -3075,30 +2962,8 @@
   }
 
   function renderHome() {
-    document.getElementById('homeTiles').innerHTML = visibleSections().map(tileHtml).join('');
+    document.getElementById('homeTiles').innerHTML = SECTIONS.map(tileHtml).join('');
   }
-
-  function renderRoleTiles() {
-    document.getElementById('roleTiles').innerHTML = ROLES.map(r => `
-      <a class="home-tile" href="#" data-role="${r.id}">
-        <span class="tile-icon">${r.icon}</span>
-        <span class="tile-text">
-          <span class="tile-title">${r.title}</span>
-          <span class="tile-sub">${r.sub}</span>
-        </span>
-        ${ICON_CHEVRON}
-      </a>`).join('');
-  }
-
-  document.getElementById('roleTiles').addEventListener('click', e => {
-    const tile = e.target.closest('[data-role]');
-    if (!tile) return;
-    e.preventDefault();
-    setRole(tile.dataset.role);
-    renderHome();
-    location.hash = tile.dataset.role === 'assistenz' ? '#hilfsleitung' : '#start';
-    route();
-  });
 
   function renderChoose() {
     document.getElementById('chooseTiles').innerHTML = SECTIONS[0].children.map(tileHtml).join('');
@@ -3110,7 +2975,10 @@
         ${sec.icon}<span>${sec.title}</span>${sec.id === current ? ICON_CHECK : ''}
       </a>`;
     let html = item({ id: 'start', title: 'Startseite', icon: ICON_HOME }, false) + '<div class="menu-sep"></div>';
-    visibleSections().forEach(sec => { html += item(sec, false); });
+    SECTIONS.forEach(sec => {
+      html += item(sec, false);
+      (sec.children || []).forEach(child => { html += item(child, true); });
+    });
     menuPop.innerHTML = html;
   }
 
@@ -3126,8 +2994,7 @@
 
   function showView(id) {
     VIEW_IDS.forEach(v => document.getElementById('view-' + v).classList.toggle('hidden', v !== id));
-    menuBtn.classList.toggle('hidden', id === 'start' || id === 'gate' || id === 'rolle' || getRole() === 'assistenz');
-    document.querySelectorAll('.js-role-link, .js-role-sep').forEach(el => el.classList.toggle('hidden', !getRole()));
+    menuBtn.classList.toggle('hidden', id === 'start' || id === 'gate');
     renderMenu(id);
     closeMenu();
     window.scrollTo(0, 0);
@@ -3200,17 +3067,7 @@
     const id = location.hash.replace('#', '');
     const target = VIEW_IDS.includes(id) && id !== 'gate' ? id : 'start';
     if (!unlocked) { showView('gate'); return; }
-    if (target === 'rolle') { showView(target); return; }
-    const role = getRole();
-    if (!role) { showView('rolle'); return; }
-    // Erlaubte Bereiche je Rolle; alles andere führt zum passenden Startbereich
-    const allowed = role === 'assistenz' ? ['hilfsleitung'] : ['start', 'hauptleitung', 'privatkurse'];
-    let finalTarget = target;
-    if (!allowed.includes(finalTarget)) {
-      finalTarget = role === 'assistenz' ? 'hilfsleitung' : (target === 'kurseinteilung' ? 'hauptleitung' : 'start');
-    }
-    if (finalTarget !== target) history.replaceState(null, '', '#' + finalTarget);
-    showView(finalTarget);
+    showView(target);
   }
 
   menuBtn.addEventListener('click', e => {
@@ -3232,7 +3089,6 @@
   });
   renderHome();
   renderChoose();
-  renderRoleTiles();
   route();
   // Zugangscode im Hintergrund prüfen (der Server prüft ihn bei jeder Anfrage zusätzlich)
   checkAccess(getCode()).then(status => {
